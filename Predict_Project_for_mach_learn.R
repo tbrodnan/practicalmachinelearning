@@ -1,6 +1,5 @@
 #  I could not find the detailed instructions for this assignment when I went to complete it
 #  I stumbleed upon them earlier in the course and completed assignment from memory.
-#
 # Loading Libraries
 library(caret)
 library(pgmm)
