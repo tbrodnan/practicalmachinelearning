@@ -1,34 +1,29 @@
-# I am submitting this .R file since I am running out of time to figure out how to submit it
-# as an MD or an RMD
-# The code for the plots is also included in this file as I dont have time to figure out how
-# to create a compiled HTML file.
-# I took the toolbox class several months ago, so Ihave familiarity with GIT, but some of this was
-# not addressed in either class
-
+#  I could not find the detailed instructions for this assignment when I went to complete it
+#  I stumbleed upon them earlier in the course and completed assignment from memory.
+#
+# Loading Libraries
 library(caret)
 library(pgmm)
 library(rattle)
 library(rpart)
 library(rpart.plot)
 library(randomForest)
-#
-setwd("C:/Users/Tom/Desktop/Tom_2016/Coursera/Machine_Learning_John_Hop/Predict_Project")
+
+
 # I downloaded the CSV files into a directory I set as my working directory
 # Next I load the testing data set and training data sets into two corresponding data frames
 # I use the na.strings argument to help prepare the data for cleansing by setting the indicated values as NA
+setwd("C:/Users/Tom/Desktop/Tom_2016/Coursera/Machine_Learning_John_Hop/Predict_Project")
 df_pml_train <- read.csv("pml-training.csv",stringsAsFactors=FALSE,na.strings=c("NA", "#DIV/0!", ""))
 df_pml_test <- read.csv("pml-testing.csv",stringsAsFactors=FALSE,na.strings=c("NA", "#DIV/0!", ""))
 
 # Data cleansing
 # 1. I remove columns not relevant to the analysis e.g. time series data by subsetting
 # df_pml_train and storing it into a new data frame df_temp
-# 2. I then remove the columns that have NA data by identifying the valid columns and creating
-# a new data frame df_train for further processing (partitioning)
+# 2. I then remove the columns that have NA data by identifying the valid columns and creating a new data frame df_train for further processing (partitioning)
 df_temp <- df_pml_train[,-c(1:7)]
 valid_cols <- sapply(1:ncol(df_temp),function(x) (0==sum(is.na(df_temp[,x])) ))
 df_train <- df_temp[, valid_cols]
-# by default the class of df_train$classe is character
-# I set to class = factor
 df_train$classe = factor(df_train$classe)
 
 # perfrom same cleansing on test
@@ -36,9 +31,9 @@ df_temp <- df_pml_test[,-c(1:7)]
 valid_cols <- sapply(1:ncol(df_temp),function(x) (0==sum(is.na(df_temp[,x])) ))
 df_test <- df_temp[, valid_cols]
 
-
 dim(df_train)
 dim(df_test)
+
 # df_test is reserved to determine model error and validate the model.
 # I create model building training and test sets labelled mod_train and mod_test from df_train
 # 60% of the sample is used for training with 40% reserved for testing
@@ -48,11 +43,12 @@ mod_train <-df_train[inTrain,]
 mod_test <- df_train[-inTrain,]
 
 # I use the classification tree as the first model to evaluate for prediction of exercise perfromance class
-# I train the model on the mod_train data set
-rpart_modFit <- train(classe ~ ., method = "rpart", data = mod_train)
+# I predict the classe of the mod_test data set
+# I do not expect this to be highly accurate, but good to validate assumption
 
+rpart_modFit <- train(classe ~ ., method = "rpart", data = mod_train)
 fancyRpartPlot(rpart_modFit$finalModel)
-# I use the fitted model to predict the classe of the mod_test data set.
+
 pred_rpart <- predict(rpart_modFit, newdata = mod_test)
 con_mat <- confusionMatrix(pred_rpart, mod_test$classe)
 con_mat
